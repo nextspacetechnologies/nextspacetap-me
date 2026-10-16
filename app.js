@@ -96,7 +96,7 @@
     document.title = str(p.display_name, 80) + ' | NextSpace TAP';
 
     app.textContent = '';
-    var wrap = el('div', 'wrap');
+    var wrap = el('div', 'wrap layout-' + (/^[a-z_]{3,24}$/.test(str(p.layout, 24)) ? p.layout : 'professional'));
 
     var cover = el('div', 'cover');
     var cv = safeImg(p.cover_photo_url);
@@ -270,6 +270,16 @@
     wrap.appendChild(foot);
 
     app.appendChild(wrap);
+  }
+
+  // Preview mode: the registration page embeds this script in an iframe and posts the draft profile.
+  if (window.__TAP_PREVIEW) {
+    window.addEventListener('message', function (e) {
+      if (e.source !== window.parent || !e.data || e.data.type !== 'tap-preview' || typeof e.data.profile !== 'object' || !e.data.profile) return;
+      try { render(e.data.profile); } catch (err) { /* ignore a half-filled draft */ }
+    });
+    window.parent.postMessage({ type: 'tap-preview-ready' }, '*');
+    return;
   }
 
   var slug = getSlug();
