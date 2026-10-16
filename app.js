@@ -143,13 +143,25 @@
     var secs = p.sections && typeof p.sections === 'object' && !Array.isArray(p.sections) ? p.sections : {};
     Object.keys(secs).slice(0, 40).forEach(function (k) {
       var items = arr(secs[k]).slice(0, 500);
-      var made = [];
+      var made = [], notes = [];
       items.forEach(function (it) {
-        var a = link(itemUrl(it), itemLabel(it) || str(k, 40), 'btn');
-        if (a) made.push(a);
+        if (!it || typeof it !== 'object') return;
+        var kind = str(it.kind, 10), val = str(it.value, 2000), lab = itemLabel(it) || str(k, 40);
+        if (str(it.id, 40) === 'gcashNumber') {
+          var num = val.replace(/\D/g, '');
+          if (num) { var g = link('https://gcash.com/send?number=' + num, 'Send via GCash', 'btn'); if (g) made.push(g); }
+          return;
+        }
+        if (kind === 'link' || kind === 'qr') {
+          var a = link(val, lab, 'btn');
+          if (a) made.push(a); else if (val) notes.push(lab + ': ' + val);
+        } else if (val) {
+          notes.push(lab + ': ' + val);
+        }
       });
-      if (!made.length) return;
+      if (!made.length && !notes.length) return;
       var s = section(str(k, 40).replace(/_/g, ' '));
+      if (notes.length) s.appendChild(el('p', 'bio', notes.join(' · ')));
       var col = el('div', 'btns'); col.style.padding = '0';
       made.forEach(function (a) { col.appendChild(a); });
       s.appendChild(col);
