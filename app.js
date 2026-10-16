@@ -173,10 +173,11 @@
     if (svc.length) {
       var ss = section('Services');
       svc.forEach(function (it) {
+        if (!it || typeof it !== 'object') return;
         var c = el('div', 'card');
-        c.appendChild(el('b', '', str(it && (it.title || it.name) || (typeof it === 'string' ? it : ''), 120)));
-        if (it && it.description) c.appendChild(el('p', '', str(it.description, 500)));
-        if (it && it.price) c.appendChild(el('span', '', str(it.price, 40)));
+        c.appendChild(el('b', '', (str(it.icon, 8) + ' ' + str(it.name, 120)).trim()));
+        if (it.description) c.appendChild(el('p', '', str(it.description, 500)));
+        if (it.location) c.appendChild(el('span', '', str(it.location, 160)));
         ss.appendChild(c);
       });
       wrap.appendChild(ss);
@@ -187,11 +188,13 @@
     if (prods.length) {
       var ps = section('Products');
       prods.forEach(function (it) {
+        if (!it || typeof it !== 'object') return;
         var c = el('div', 'card');
-        c.appendChild(el('b', '', str(it && (it.title || it.name), 120)));
-        if (it && it.description) c.appendChild(el('p', '', str(it.description, 500)));
-        if (it && it.price) c.appendChild(el('span', '', str(it.price, 40)));
-        var a = it && link(it.url || it.link, 'View', 'btn'); if (a) { a.style.marginTop = '8px'; c.appendChild(a); }
+        var pi = safeImg(it.image);
+        if (pi) { var im2 = el('img'); im2.src = pi; im2.alt = ''; im2.loading = 'lazy'; im2.style.cssText = 'width:100%;border-radius:8px;margin-bottom:8px'; c.appendChild(im2); }
+        c.appendChild(el('b', '', str(it.name, 120)));
+        if (it.price) c.appendChild(el('span', '', str(it.price, 40)));
+        var a = link(it.link, 'View', 'btn'); if (a) { a.style.marginTop = '8px'; c.appendChild(a); }
         ps.appendChild(c);
       });
       wrap.appendChild(ps);
@@ -202,9 +205,12 @@
     if (posts.length) {
       var po = section('Updates');
       posts.forEach(function (it) {
+        if (!it || typeof it !== 'object') return;
         var c = el('div', 'card');
-        if (it && it.title) c.appendChild(el('b', '', str(it.title, 120)));
-        c.appendChild(el('p', '', str(it && (it.body || it.text || it.content || (typeof it === 'string' ? it : '')), 800)));
+        c.appendChild(el('b', '', str(it.title, 120)));
+        if (it.date) c.appendChild(el('span', '', str(it.date, 40)));
+        if (it.summary) c.appendChild(el('p', '', str(it.summary, 800)));
+        var a = link(it.link, 'Read more', 'btn'); if (a) { a.style.marginTop = '8px'; c.appendChild(a); }
         po.appendChild(c);
       });
       wrap.appendChild(po);
@@ -251,7 +257,7 @@
         if (!it || typeof it !== 'object') return;
         var row = el('div', 'hours');
         row.appendChild(el('span', '', str(it.day, 20)));
-        row.appendChild(el('span', '', it.closed ? 'Closed' : (str(it.open || it.from, 10) + ' - ' + str(it.close || it.to, 10))));
+        row.appendChild(el('span', '', str(it.from, 10) + ' - ' + str(it.to, 10)));
         hs.appendChild(row);
       });
       wrap.appendChild(hs);
